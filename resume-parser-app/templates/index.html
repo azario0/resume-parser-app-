@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Parser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Resume Parser</h1>
+            <p>Upload a PDF resume and let Gemini extract the key details instantly.</p>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Conditionally show the results or the upload form -->
+        {% if data %}
+            <div class="results-section">
+                <div class="profile-header">
+                    <h2>{{ data.name }} {{ data.surname }}</h2>
+                    <div class="contact-info">
+                        {% if data.email %}<span>📧 {{ data.email }}</span>{% endif %}
+                        {% if data.phone_number %}<span>📞 {{ data.phone_number }}</span>{% endif %}
+                        {% if data.location %}<span>📍 {{ data.location }}</span>{% endif %}
+                    </div>
+                </div>
+
+                {% if data.experience %}
+                <div class="experience-section">
+                    <h3 class="section-title">Work Experience</h3>
+                    {% for job in data.experience %}
+                    <div class="experience-item">
+                        <div class="experience-header">
+                            <span class="job-title">{{ job.job_title }}</span>
+                            <span class="job-dates">{{ job.start_date }} - {{ job.end_date }}</span>
+                        </div>
+                        {% if job.company %}<p class="job-company">{{ job.company }}</p>{% endif %}
+                        <p class="job-description">{{ job.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if data.projects %}
+                <div class="projects-section">
+                    <h3 class="section-title">Projects</h3>
+                    {% for project in data.projects %}
+                    <div class="project-item">
+                        <p class="project-title">{{ project.title }}</p>
+                        <p class="project-description">{{ project.description }}</p>
+                        {% if project.technologies %}
+                        <div class="tech-tags-container">
+                            {% for tech in project.technologies %}
+                                <span class="tech-tag">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if data.certificates %}
+                <div class="certificates-section">
+                    <h3 class="section-title">Certificates</h3>
+                    <div class="certificates-list">
+                        <ul>
+                            {% for cert in data.certificates %}
+                            <li>{{ cert }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/" class="submit-btn">Parse Another Resume</a>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="upload-section">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="upload-area">
+                        <input type="file" name="resume" accept=".pdf" id="resume-file" required>
+                        <img src="{{ url_for('static', filename='img/upload-icon.svg') }}" alt="Upload Icon" class="upload-icon">
+                        <p class="upload-text"><span>Click to upload</span> or drag and drop your resume here</p>
+                        <p class="upload-hint">PDF only, max 16MB</p>
+                    </div>
+                    <button type="submit" class="submit-btn">Parse Resume</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
